@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Grpc.Core;
+using Grpc.Core.Logging;
 using GrpcProxyTest.Protobuf;
 
 namespace GrpcProxyTest
@@ -22,8 +24,10 @@ namespace GrpcProxyTest
 
         static void Main(string[] args)
         {
+            GrpcEnvironment.SetLogger(new ConsoleLogger());
+
             Environment.SetEnvironmentVariable("GRPC_DNS_RESOLVER", "native");
-            Environment.SetEnvironmentVariable("GRPC_TRACE", "");
+            Environment.SetEnvironmentVariable("GRPC_TRACE", "all");
             Environment.SetEnvironmentVariable("GRPC_VERBOSITY", "info");
 
             short proxyPort = 8002;
@@ -33,7 +37,7 @@ namespace GrpcProxyTest
 
             var grpcServer = new Server
             {
-                Ports = { new ServerPort(Environment.MachineName, destinationPort, ServerCredentials.Insecure) }
+                Ports = {new ServerPort(Environment.MachineName, destinationPort, ServerCredentials.Insecure)}
             };
             grpcServer.Services.Add(
                 TestInterface.BindService(new Impl())
@@ -50,7 +54,5 @@ namespace GrpcProxyTest
             Console.ReadKey();
         }
     }
-    
-    // Sets up the ASP.NET application with the reverse proxy enabled.
 }
 
